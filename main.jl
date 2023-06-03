@@ -18,4 +18,5 @@ function main(width, height, camera, world, background, pattern; output_filename
     end
     
     save(output_filename, clamp01nan.(img))
+    display("Saved image in $output_filename")
 end
