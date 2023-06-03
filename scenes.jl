@@ -1,4 +1,4 @@
-include("MSAA_patterns.jl")
+include("src/MSAA_patterns.jl")
 scenes = Dict{Symbol, Function}()
 
 for filename in readdir("samples")

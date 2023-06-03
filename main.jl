@@ -1,4 +1,4 @@
-include("Ray_Tracing.jl")
+include("src/Ray_Tracing.jl")
 include("scenes.jl")
 
 # Use main with get_scene to render predefined scenes from the Ray Tracing in One Weekend series.
