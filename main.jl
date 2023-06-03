@@ -20,3 +20,5 @@ function main(width, height, camera, world, background, pattern; output_filename
     save(output_filename, clamp01nan.(img))
     display("Saved image in $output_filename")
 end
+
+main(key::Symbol, args...) = main(get_scene(key)..., args...)
