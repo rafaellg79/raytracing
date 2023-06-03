@@ -1,4 +1,6 @@
-scenes[:cornell_smoke_box] = (F::Type=Float32) -> begin
+using Rotations
+
+scenes[:cornell_smoke_box] = (F::Type=Float32; N::Int=200) -> begin
     aspect_ratio = one(F)
     width = 600
     height = trunc(Int, width / aspect_ratio)
@@ -39,7 +41,7 @@ scenes[:cornell_smoke_box] = (F::Type=Float32) -> begin
                 ]
     
     background = zero(Vec3{F})
-    pattern = Halton_sequence32(F, 200)
+    pattern = Halton_sequence32(F, N)
     
     width, height, camera, world, background, pattern
 end

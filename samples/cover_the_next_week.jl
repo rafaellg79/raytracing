@@ -1,6 +1,6 @@
 using Rotations
 
-scenes[:cover2] = (F::Type=Float32) -> begin
+scenes[:cover2] = (F::Type=Float32; N::Int=10000) -> begin
     aspect_ratio = one(F)
     width = 800
     height = trunc(Int, width / aspect_ratio)
@@ -83,7 +83,7 @@ scenes[:cover2] = (F::Type=Float32) -> begin
                     ]
     
     background = zero(Vec3{F})
-    pattern = Halton_sequence32(F, 10000)
+    pattern = Halton_sequence32(F, N)
     
     width, height, camera, world, background, pattern
 end

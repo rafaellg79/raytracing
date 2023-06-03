@@ -21,4 +21,4 @@ function main(width, height, camera, world, background, pattern; output_filename
     display("Saved image in $output_filename")
 end
 
-main(key::Symbol, args...) = main(get_scene(key)..., args...)
+main(key::Symbol; output_filename=joinpath("outputs", "image.png"), gpu::Bool=false, args...) = main(get_scene(key, args...)...; output_filename=output_filename, gpu=gpu)
