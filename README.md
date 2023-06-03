@@ -30,10 +30,11 @@ KeySet for a Dict{Symbol, Function} with 5 entries. Keys:
   :cover2
   :cornell_smoke_box
 
-julia> main(:cornell_box; output_filename=joinpath("outputs", "cornell_box.png"))
+julia> main(:cornell_box; N=10000))
 399/400
+"Saved image in outputs/image.png"
 ```
 
 The resulting image shown below is then saved in `outputs/image.png`.
 
-![Cornell box rendered with 1000 samples](/outputs/cornell_box_1000_samples.png)
+![Cornell box rendered with 10000 samples per pixel](/outputs/cornell_box_10000_samples.png)
