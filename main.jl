@@ -11,10 +11,10 @@ function main(width, height, camera, world, background, pattern; output_filename
     if gpu
         d_img = CUDA.zeros(eltype(img), height, width)
         
-        @time draw!(d_img, world, camera; background = background, pattern = pattern)
+        draw!(d_img, world, camera; background = background, pattern = pattern)
         img = Array(d_img)
     else
-        @time draw!(img, world, camera; background = background, pattern = pattern)
+            draw!(img, world, camera; background = background, pattern = pattern)
     end
     
     save(output_filename, clamp01nan.(img))

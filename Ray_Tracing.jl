@@ -148,7 +148,7 @@ function draw!(img::CuArray{RGB{F},2}, world::SceneManager, camera::Camera{F}; b
     blocks_dim = (8, 8, 1)
     buffer = CUDA.zeros(UInt16, 16, prod(threads_dim .* blocks_dim))
     
-    CUDA.@time @cuda threads=threads_dim blocks=blocks_dim draw_kernel(channelview(img), cu_bvh, camera, CuArray(pattern), background, CUDA.zeros(UInt32, 2), buffer)
+    @cuda threads=threads_dim blocks=blocks_dim draw_kernel(channelview(img), cu_bvh, camera, CuArray(pattern), background, CUDA.zeros(UInt32, 2), buffer)
     img ./= size(pattern, 2)
     img .= map(c -> RGB{F}(sqrt(c.r), sqrt(c.g), sqrt(c.b)), img)
     synchronize()
