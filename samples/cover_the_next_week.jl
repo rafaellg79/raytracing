@@ -1,3 +1,5 @@
+using Rotations
+
 scenes[:cover2] = (F::Type=Float32) -> begin
     aspect_ratio = one(F)
     width = 800
@@ -77,11 +79,11 @@ scenes[:cover2] = (F::Type=Float32) -> begin
                      xz_rect(123, 423, 147, 412, 554, light);
                      objects;
                      boxes;
-                     Transform{BVHTree{Sphere{Material{SolidColor}}}}(spheres, Float64[RotY(deg2rad(15)) [-100; 270; 395]; 0 0 0 1]);
+                     Transform(spheres, F[RotY(deg2rad(15)) [-100; 270; 395]; 0 0 0 1]);
                     ]
     
     background = zero(Vec3{F})
-    pattern = Halton_sequence32(F, 10)
+    pattern = Halton_sequence32(F, 10000)
     
     width, height, camera, world, background, pattern
 end
