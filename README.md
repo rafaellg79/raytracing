@@ -1,4 +1,4 @@
-# raytracing
+# Ray Tracing in One Weekend
 
 A Ray Tracer based on the [Ray Tracing in One Weekend Series](https://raytracing.github.io/) written in [Julia](https://julialang.org/).
 
