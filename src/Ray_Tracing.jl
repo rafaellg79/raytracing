@@ -10,7 +10,7 @@ include("cuscene_manager.jl")
 # Utilities
 include("camera.jl")
 
-function path_trace(ray::Ray{F}, scene::SceneManager; background::Vec3{F}=zero(Vec3{F}), depth::Int=50) where F<:AbstractFloat
+function trace(ray::Ray{F}, scene::SceneManager; background::Vec3{F}=zero(Vec3{F}), depth::Int=50) where F<:AbstractFloat
     accumulated_attenuation = Vec3{F}(1)
     color = zero(Vec3{F})
     while depth > 0
@@ -30,7 +30,7 @@ function path_trace(ray::Ray{F}, scene::SceneManager; background::Vec3{F}=zero(V
     return color
 end
 
-function path_trace(ray::Ray{F}, scene::Vector{T}; background::Vec3{F}=zero(Vec3{F}), depth::Int=50) where {F<:AbstractFloat, T<:Hittable}
+function trace(ray::Ray{F}, scene::Vector{T}; background::Vec3{F}=zero(Vec3{F}), depth::Int=50) where {F<:AbstractFloat, T<:Hittable}
     accumulated_attenuation = Vec3{F}(1)
     color = zero(Vec3{F})
     while depth > 0
@@ -50,7 +50,7 @@ function path_trace(ray::Ray{F}, scene::Vector{T}; background::Vec3{F}=zero(Vec3
     return color
 end
 
-function cu_path_trace(ray::Ray{F}, scene::CuSceneManager, buffer::CuDeviceArray; background::Vec3{F}=zero(Vec3{F}), depth::Int=50) where F<:AbstractFloat
+function cu_trace(ray::Ray{F}, scene::CuSceneManager, buffer::CuDeviceArray; background::Vec3{F}=zero(Vec3{F}), depth::Int=50) where F<:AbstractFloat
     accumulated_attenuation = Vec3{F}(1)
     color = zero(Vec3{F})
     while depth > 0
@@ -84,7 +84,7 @@ function draw!(img::Array{RGB{F},2}, world::SceneManager, camera::Camera{F}; bac
                 s = (i + dx) / (width-1)
                 t = (j + dy) / (height-1)
                 r = get_ray(camera, s, t)
-                col += path_trace(r, bvh; background=background)
+                col += trace(r, bvh; background=background)
             end
             col /= size(pattern, 2)
             col = Vec3{F}(sqrt(col.x), sqrt(col.y), sqrt(col.z))
@@ -125,7 +125,7 @@ function draw_kernel(img::CuDeviceArray{F}, scene::CuSceneManager, camera::Camer
             t = (y + pattern[2, z]) / dims[2]
             
             r = get_ray(camera, s, t)
-            color += cu_path_trace(r, scene, buffer; background=background)
+            color += cu_trace(r, scene, buffer; background=background)
         end
         CUDA.atomic_add!(pointer(img, (x * (dims[2]+1) + dims[2] - y) * 3 + 1), color.x)
         CUDA.atomic_add!(pointer(img, (x * (dims[2]+1) + dims[2] - y) * 3 + 2), color.y)
