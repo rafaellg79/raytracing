@@ -82,7 +82,7 @@ function apply_point(T::Tuple, v::Vec3{F}) where F<:AbstractFloat
 end
 
 function apply_vec(T::Matrix{F}, v::Vec3{F}) where F<:AbstractFloat
-    return Vector3f(
+    return Vec3{F}(
             T[1, 1] * v.x + T[1, 2] * v.y + T[1, 3] * v.z,
             T[2, 1] * v.x + T[2, 2] * v.y + T[2, 3] * v.z,
             T[3, 1] * v.x + T[3, 2] * v.y + T[3, 3] * v.z

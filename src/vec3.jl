@@ -83,7 +83,7 @@ rand(::Type{Vec3{F}}) where F = Vec3{F}(rand(F), rand(F), rand(F))
 rand(::Type{Vec3{F}}, s::Int) where F = [rand(Vec3{F}) for i in 1:s]
 rand(::Type{Vec3{F}}, min::F, max::F) where F = Vec3{F}(rand(F) * (max - min) + min, rand(F) * (max - min) + min, rand(F) * (max - min) + min)
 
-function random_in_unit_sphere(::Type{Vec3{F}}=Vector3f) where F
+function random_in_unit_sphere(::Type{Vec3{F}}=Vec3{Float32}) where F
     ONE = one(F)
     p = rand(Vec3{F}, -ONE, ONE)
     while dot(p, p) > ONE
@@ -92,7 +92,7 @@ function random_in_unit_sphere(::Type{Vec3{F}}=Vector3f) where F
     return p
 end
 
-function random_in_unit_disk(::Type{Vec3{F}}=Vector3f) where F
+function random_in_unit_disk(::Type{Vec3{F}}=Vec3{Float32}) where F
     ONE = one(F)
     ZERO = zero(F)
     TWO = F(2)
@@ -103,6 +103,6 @@ function random_in_unit_disk(::Type{Vec3{F}}=Vector3f) where F
     return p
 end
 
-function random_unit_vector(::Type{V}=Vector3f) where V<:Vec3
+function random_unit_vector(::Type{V}=Vec3{Float32}) where V<:Vec3
     return normalize(random_in_unit_sphere(V))
 end
