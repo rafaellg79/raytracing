@@ -4,6 +4,7 @@ include("cuBVH.jl")
 include("box.jl")
 include("transform.jl")
 include("constant_medium.jl")
+include("sphere.jl")
 include("scene_manager.jl")
 include("cuscene_manager.jl")
 
