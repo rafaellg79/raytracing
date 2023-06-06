@@ -1,4 +1,4 @@
-# raytracing
+# Ray Tracing in One Weekend
 
 A Ray Tracer based on the [Ray Tracing in One Weekend Series](https://raytracing.github.io/) written in [Julia](https://julialang.org/).
 
@@ -13,7 +13,7 @@ To achieve that, heavy specialization of methods are performed by the JIT compil
 All necessary packages are included in the Project.toml file.
 To install the necessary packages from the Julia REPL, enter the Pkg mode (type `]`) and run:
 ```julia
-pkg> activate .
+pkg> activate <path_to_Project.toml>
 pkg> instantiate
 ```
 
