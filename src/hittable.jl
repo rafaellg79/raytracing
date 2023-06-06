@@ -111,3 +111,52 @@ function emit(hit::HitRecord{F, T}) where {F<:AbstractFloat, T<:Material}
         return zero(Vec3{F})
     end
 end
+
+function hit(bbox::AABB, r::Ray{F}, t_min::F, t_max::F) where F <: AbstractFloat
+    tmin = (bbox.min.x - r.origin.x) / r.direction.x
+    tmax = (bbox.max.x - r.origin.x) / r.direction.x
+    if tmin > tmax
+        tmin, tmax = tmax, tmin
+    end
+    if tmax < t_max
+        t_max = tmax
+    end
+    if tmin > t_min
+        t_min = tmin
+    end
+    if t_max <= t_min
+        return false
+    end
+
+    tmin = (bbox.min.y - r.origin.y) / r.direction.y
+    tmax = (bbox.max.y - r.origin.y) / r.direction.y
+    if tmin > tmax
+        tmin, tmax = tmax, tmin
+    end
+    if tmax < t_max
+        t_max = tmax
+    end
+    if tmin > t_min
+        t_min = tmin
+    end
+    if t_max <= t_min
+        return false
+    end
+
+    tmin = (bbox.min.z - r.origin.z) / r.direction.z
+    tmax = (bbox.max.z - r.origin.z) / r.direction.z
+    if tmin > tmax
+        tmin, tmax = tmax, tmin
+    end
+    if tmax < t_max
+        t_max = tmax
+    end
+    if tmin > t_min
+        t_min = tmin
+    end
+    if t_max <= t_min
+        return false
+    end
+    
+    return true
+end
