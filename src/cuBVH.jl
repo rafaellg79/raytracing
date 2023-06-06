@@ -82,8 +82,3 @@ function cu_hit(next::CuDeviceArray, tree::CuBVHTree{A, B}, ray::Ray{F}, t_min::
     end
     return closest_hit
 end
-
-function cu_shadow_test(shadow_ray::Ray, scene::CuBVHTree, light_distance::Float64, buffer::CuDeviceArray)
-    hit_result = cu_hit(scene, shadow_ray, shadow_ray.min, shadow_ray.max, buffer)
-    return hit_result.t < light_distance
-end
