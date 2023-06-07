@@ -42,9 +42,11 @@ scenes[:tetrahedron] = (F::Type=Float32; N::Int=500) -> begin
             
             vertices = [Vec3{F}(x, 0, -r), Vec3{F}(-d, -edge_length/2, -r), Vec3{F}(-d, edge_length/2, -r), Vec3{F}(0, 0, R)] .+ Ref(corner)
             
-            push!(world, Triangle(vertices[1], vertices[2], vertices[3], material))
+            # The ordering of the vertices below is important to determine the normal
+            # which is important to compute hit information
+            push!(world, Triangle(vertices[1], vertices[3], vertices[2], material))
             push!(world, Triangle(vertices[1], vertices[2], vertices[4], material))
-            push!(world, Triangle(vertices[1], vertices[3], vertices[4], material))
+            push!(world, Triangle(vertices[1], vertices[4], vertices[3], material))
             push!(world, Triangle(vertices[2], vertices[3], vertices[4], material))
         end
     end
