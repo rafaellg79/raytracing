@@ -77,5 +77,5 @@ function hit(triangle::Triangle{F, T}, r::Ray{F}, t_min::F, t_max::F) where {F<:
     
     p = at(r, t)
     front_face = dot(r.direction, normal) < zero(F)
-    return HitRecord(t, p, (-1+(front_face<<1)) * normal, triangle.material, front_face, u, v)
+    return HitRecord(t, p, (-1+(front_face<<1)) * normalize(normal), triangle.material, front_face, u, v)
 end
