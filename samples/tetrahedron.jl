@@ -1,4 +1,4 @@
-scenes[:triangles] = (F::Type=Float32; N::Int=500) -> begin
+scenes[:tetrahedron] = (F::Type=Float32; N::Int=500) -> begin
     aspect_ratio = F(3/2)
     width = 1200
     height = trunc(Int, width / aspect_ratio)
