@@ -20,7 +20,10 @@ scenes[:tetrahedron] = (F::Type=Float32; N::Int=500) -> begin
     world = Hittable[Sphere(Vec3{F}(0, -1000, -1), 1000, ground)]
     for a = -11:10, b = -11:10
         choose_mat = rand(F)
-        corner = Vec3{F}(a + 0.9*rand(), 0.2, b + 0.9*rand())
+        corner = Vec3{F}(2a + 0.9*rand(), 0.2, 2b + 0.9*rand())
+        
+        s = 0.25
+        tetrahedron_vertices = [-1 -1 -1; -1 1 1; 1 -1 1; 1 1 -1]' .* s
         
         if length(corner - Vec3{F}(4, 0.2, 0)) > F(0.9)
             material = nothing
@@ -34,13 +37,8 @@ scenes[:tetrahedron] = (F::Type=Float32; N::Int=500) -> begin
             else
                 material = Material(Dielectric, F(1.5))
             end
-            edge_length = one(F)
-            x = F(sqrt(3) /  3) * edge_length
-            r = F(sqrt(6) / 12) * edge_length
-            R = F(sqrt(6) /  4) * edge_length
-            d = F(sqrt(3) /  6) * edge_length
             
-            vertices = [Vec3{F}(x, 0, -r), Vec3{F}(-d, -edge_length/2, -r), Vec3{F}(-d, edge_length/2, -r), Vec3{F}(0, 0, R)] .+ Ref(corner)
+            vertices = map(v -> Vec3{F}(v...) + corner, eachcol(RotXYZ(0, rand(F)*2pi, 0) * tetrahedron_vertices))
             
             # The ordering of the vertices below is important to determine the normal
             # which is important to compute hit information
