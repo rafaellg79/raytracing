@@ -13,54 +13,6 @@ function Adapt.adapt_structure(to, cu_scene::CuSceneManager)
     CuSceneManager{typeof(scene)}(scene)
 end
 
-# cu_type functions
-# Receive a type and return the CUDA equivalent type recursively 
-# substituting the parametric types by CUDA equivalent types
-# For example cu_type(Transform{BVHTree}) == Transform{CuBVHTree}
-function cu_type(::Type{T}) where T
-    return T
-end
-
-function cu_type(::Type{ConstantMedium{T}}) where T
-    return ConstantMedium{cu_type(T)}
-end
-
-function cu_type(::Type{Transform{T}}) where T
-    return Transform{cu_type(T)}
-end
-
-function cu_type(::Type{Vector{T}}) where T
-    return CuVector{cu_type(T)}
-end
-
-function cu_type(::Type{BVHTree{T}}) where T
-    return CuBVHTree{CuVector{BVHNode, CUDA.Mem.DeviceBuffer}, CuVector{cu_type(T), CUDA.Mem.DeviceBuffer}}
-end
-
-# cu function overload for parametric types
-function cu(transforms_h::Vector{Transform{BVHTree{T}}}) where T
-    cu_transforms_h = [cu(transform) for transform in transforms_h]
-    return cu(cu_transforms_h)
-end
-
-function cu(transforms_h::Vector{Transform{Vector}})
-    cu_transforms_h = [cu(transform) for transform in transforms_h]
-    return cu(cu_transforms_h)
-end
-
-function cu(trees_h::Vector{BVHTree})
-    cu_trees_h = [cu(tree) for tree in transforms_h]
-    return cu(cu_trees_h)
-end
-
-function cu(constant_medium::ConstantMedium{T}) where T
-    return ConstantMedium(cu(constant_medium.boundary), constant_medium.phase_function, constant_medium.neg_inv_density)
-end
-
-function cu(transform::Transform{T}) where T
-    return Transform(cu(transform.object), transform.xform, transform.inv_xform, transform.bbox)
-end
-
 function CuSceneManager(scene::SceneManager)
     d_scene = cu.(scene)
     return CuSceneManager{typeof(d_scene)}(d_scene)
