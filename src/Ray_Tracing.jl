@@ -74,6 +74,7 @@ function draw!(img::Array{RGB{F},2}, world::SceneManager, camera::Camera{F}; bac
     bvh = build_bvh(world)
     
     for i = 0:width-1
+        print("\r$i/$width")
         for j = height-1:-1:0
             col = Vec3{F}(0, 0, 0)
             for n in 1:size(pattern, 2)
@@ -88,11 +89,9 @@ function draw!(img::Array{RGB{F},2}, world::SceneManager, camera::Camera{F}; bac
             col = Vec3{F}(sqrt(col.x), sqrt(col.y), sqrt(col.z))
             img[height-j, i+1] = RGB{F}(col.x, col.y, col.z)
         end
-        
-        print("\r$i/$width")
     end
     
-    print("\n")
+    print("\r$width/$width\n")
     
     return img
 end
