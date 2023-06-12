@@ -1,10 +1,7 @@
 using Images, Random, CUDA
 # Hittables
 include("cuBVH.jl")
-include("box.jl")
-include("transform.jl")
-include("constant_medium.jl")
-include("sphere.jl")
+include("shapes.jl")
 include("scene_manager.jl")
 include("cuscene_manager.jl")
 

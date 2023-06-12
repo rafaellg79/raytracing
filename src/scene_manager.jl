@@ -1,6 +1,4 @@
 include("hittable.jl")
-include("constant_medium.jl")
-include("transform.jl")
 include("BVH.jl")
 
 const SceneManager = Tuple
