@@ -38,26 +38,22 @@ function at(ray::Ray{F}, t::F) where F
     return ray.origin + ray.direction * t
 end
 
-bounding_box(objects::Vector{<:Hittable}, t::F) where F <: AbstractFloat = surrounding_box(list)
+bounding_box(objects::AbstractVector{<:Hittable}, t::F) where F <: AbstractFloat = surrounding_box(objects)
 
 function surrounding_box(objects::AbstractVector{<:Hittable})
     return reduce((a, b) -> AABB(min(a.min, b.min), max(a.max, b.max)), bounding_box(obj) for obj in objects)
 end
 
-function hit(objects::Array{T}, r::Ray{F}, t_min::F, t_max::F) where {F<:AbstractFloat, T<:Hittable}
-    closest_t = t_max
-    closest_ind = 0
+function hit(objects::AbstractVector{T}, r::Ray{F}, t_min::F, t_max::F) where {F<:AbstractFloat, T<:Hittable}
+    closest_hit = HitRecord(F, textype(T))
     for i in 1:length(objects)
-        t = hit(objects[i], r, t_min, closest_t)
-        if t < closest_t
-            closest_t = t
-            closest_ind = i
+        h = hit(objects[i], r, t_min, t_max)
+        if h.t < closest_hit.t
+            closest_hit = h
+            t_max = closest_hit.t
         end
     end
-    if closest_ind == 0
-        return HitRecord(F, textype(T))
-    end
-    return HitRecord(objects[closest_ind], r, closest_t)
+    return closest_hit
 end
 
 hit(obj::T, r::Ray{F}) where {F <: AbstractFloat, T <: Hittable} = hit(obj, r, F(0.001), F(Inf))
