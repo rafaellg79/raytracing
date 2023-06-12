@@ -9,8 +9,9 @@ struct Vec3{T}
 end
 
 # Define some useful functions for the Vec3 type
-import Base: +, -, *, /, ==, <, <=, >, >=, min, max, zero, rand, length
+import Base: +, -, *, /, ==, <, <=, >, >=, min, max, zero, rand, length, eltype
 
+eltype(::Type{Vec3{F}}) where F = F
 zero(::Type{Vec3{F}}) where F = Vec3{F}(zero(F), zero(F), zero(F))
 
 # Vector arithmetic

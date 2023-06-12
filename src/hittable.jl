@@ -31,6 +31,7 @@ abstract type Hittable{T} end
 textype(::Type{<:Hittable}) = Material
 textype(::Type{<:Hittable{T}}) where T<:Hittable = textype(T)
 textype(::Type{<:AbstractVector{T}}) where T<:Hittable = textype(T)
+textype(::Type{<:AbstractVector{T}}) where T<:Material = T
 textype(objects::Vector{T}) where T<:Hittable = reduce(promote_type, (tex for tex in textype.(typeof.(objects))))
 textype(::Type{<:Hittable{T}}) where T<:Material = T
 
