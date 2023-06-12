@@ -37,7 +37,7 @@ function hit(tree::BVHTree{F, T}, ray::Ray{F}, t_min::F, t_max::F) where {F <: A
         end
         
         if node.is_leaf
-            h = hit(tree.objects[node.left], ray, t_min, t_max)
+            h = hit((@view tree.objects[node.left:node.right]), ray, t_min, t_max)
             if h.t < closest_hit.t
                 closest_hit = h
             end
