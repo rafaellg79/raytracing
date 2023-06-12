@@ -1,15 +1,22 @@
 include("hittable.jl")
 
 struct Triangle{F, T} <: Hittable{T}
-    vertices::Tuple{Vec3{F}, Vec3{F}, Vec3{F}}
+    v1::Vec3{F}
+    v2::Vec3{F}
+    v3::Vec3{F}
     material::T
 end
 
-Triangle(vertices::Vector{Vec3{F}}, material::T) where {F <:AbstractFloat, T<:Material{F}} = Triangle(Tuple(vertices), material)
-Triangle(v1::Vec3{F}, v2::Vec3{F}, v3::Vec3{F}, material::T) where {F <:AbstractFloat, T<:Material{F}} = Triangle((v1, v2, v3), material)
+Triangle(v1::Tuple{F, F, F}, v2::Tuple{F, F, F}, v3::Tuple{F, F, F}, material::T) where {F <:AbstractFloat, T<:Material{F}} = Triangle(Vec3{F}(v1...), Vec3{F}(v2...), Vec3{F}(v3...), material)
 
 function bounding_box(t::Triangle{F}) where F<:AbstractFloat
-    return AABB{F}(minimum(t.vertices)-F(0.001), maximum(t.vertices)+F(0.001))
+    x_min = min(t.v1.x, t.v2.x, t.v3.x)-F(0.0001)
+    y_min = min(t.v1.y, t.v2.y, t.v3.y)-F(0.0001)
+    z_min = min(t.v1.z, t.v2.z, t.v3.z)-F(0.0001)
+    x_max = max(t.v1.x, t.v2.x, t.v3.x)+F(0.0001)
+    y_max = max(t.v1.y, t.v2.y, t.v3.y)+F(0.0001)
+    z_max = max(t.v1.z, t.v2.z, t.v3.z)+F(0.0001)
+    return AABB{F}(Vec3{F}(x_min, y_min, z_min), Vec3{F}(x_max, y_max, z_max))
 end
 
 # Based on Möller–Trumbore intersection algorithm:
@@ -57,11 +64,9 @@ end
 # u = dot(s, e2)/dot( normal, ray_direction)
 # v = dot(s, e1)/dot(-normal, ray_direction)
 function hit(triangle::Triangle{F, T}, r::Ray{F}, t_min::F, t_max::F) where {F<:AbstractFloat, T<:Material}
-    vertices = triangle.vertices
-    
-    e1 = vertices[2] - vertices[1]
-    e2 = vertices[3] - vertices[1]
-    origin_v1 = vertices[1] - r.origin
+    e1 = triangle.v2 - triangle.v1
+    e2 = triangle.v3 - triangle.v1
+    origin_v1 = triangle.v1 - r.origin
     
     normal = cross(e1, e2)
     s = cross(origin_v1, r.direction) # s = cross(ray_direction, -origin_v1) = -cross(-origin_v1, ray_direction) = cross(origin_v1, ray_direction)
