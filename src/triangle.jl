@@ -60,9 +60,13 @@ end
 # u = dot(cross(ray_direction, ray_origin - V1), e2)/dot( normal, ray_direction)
 # v = dot(cross(ray_direction, ray_origin - V1), e1)/dot(-normal, ray_direction)
 #
-# Let s = cross(ray_direction, ray_origin - V1) and simplify the equations to
-# u = dot(s, e2)/dot( normal, ray_direction)
-# v = dot(s, e1)/dot(-normal, ray_direction)
+# Let s = cross(ray_direction, ray_origin - V1) and c = 1/dot( normal, ray_direction)
+# then substitute in the equations
+# u = dot(s, e2) *  c
+# v = dot(s, e1) * -c
+#
+# Doing the same to t
+# t = dot(normal, V1 - ray_origin) * c
 function hit(triangle::Triangle{F, T}, r::Ray{F}, t_min::F, t_max::F) where {F<:AbstractFloat, T<:Material}
     e1 = triangle.v2 - triangle.v1
     e2 = triangle.v3 - triangle.v1
@@ -72,7 +76,7 @@ function hit(triangle::Triangle{F, T}, r::Ray{F}, t_min::F, t_max::F) where {F<:
     s = cross(origin_v1, r.direction) # s = cross(ray_direction, -origin_v1) = -cross(-origin_v1, ray_direction) = cross(origin_v1, ray_direction)
     c = inv(dot(normal, r.direction))
     
-    u = dot(s, e2) * c
+    u = dot(s, e2) *  c
     v = dot(s, e1) * -c
     t = dot(normal, origin_v1) * c
     
