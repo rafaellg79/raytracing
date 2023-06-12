@@ -20,12 +20,16 @@ scenes[:tetrahedron] = (F::Type=Float32; N::Int=500) -> begin
     world = Hittable[Sphere(Vec3{F}(0, -1000, -1), 1000, ground)]
     for a = -11:10, b = -11:10
         choose_mat = rand(F)
-        corner = Vec3{F}(2a + 0.9*rand(), 0.2, 2b + 0.9*rand())
+        center = Vec3{F}(a + 0.9*rand(), 0.2, b + 0.9*rand())
         
         s = 0.25
         tetrahedron_vertices = [-1 -1 -1; -1 1 1; 1 -1 1; 1 1 -1]' .* s
         
-        if length(corner - Vec3{F}(4, 0.2, 0)) > F(0.9)
+        # The ordering of the vertices below is important to determine the normal
+        # which is important to compute hit information
+        inds = collect(Int32[1 3 2 1; 1 2 4 1; 1 4 3 1; 2 3 4 1;]')
+        
+        if length(center - Vec3{F}(4, 0.2, 0)) > F(0.9)
             material = nothing
             if choose_mat < 0.8
                 albedo = rand(Vec3{F}) * rand(Vec3{F})
@@ -38,14 +42,9 @@ scenes[:tetrahedron] = (F::Type=Float32; N::Int=500) -> begin
                 material = Material(Dielectric, F(1.5))
             end
             
-            vertices = map(v -> Vec3{F}(v...) + corner, eachcol(RotXYZ(0, rand(F)*2pi, 0) * tetrahedron_vertices))
+            vertices = map(v -> Vec3{F}(v...) + center, eachcol(RotXYZ{F}(0, rand(F)*2pi, 0) * tetrahedron_vertices))
             
-            # The ordering of the vertices below is important to determine the normal
-            # which is important to compute hit information
-            push!(world, Triangle(vertices[1], vertices[3], vertices[2], material))
-            push!(world, Triangle(vertices[1], vertices[2], vertices[4], material))
-            push!(world, Triangle(vertices[1], vertices[4], vertices[3], material))
-            push!(world, Triangle(vertices[2], vertices[3], vertices[4], material))
+            push!(world, Mesh(vertices, [material], inds))
         end
     end
     
