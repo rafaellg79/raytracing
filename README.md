@@ -31,7 +31,7 @@ KeySet for a Dict{Symbol, Function} with 5 entries. Keys:
   :cornell_smoke_box
 
 julia> main(:cornell_box; N=10000))
-399/400
+400/400
 "Saved image in outputs/image.png"
 ```
 
