@@ -29,6 +29,10 @@ function Camera(origin::Vec3{F}, direction::Vec3{F}, up::Vec3{F}, fov::F, aspect
     return Camera{F}(origin, lower_left_corner, horizontal, vertical, u, v, w, aperture/2, t0, t1)
 end
 
+function Camera(::Type{F}=Float32; origin::Vec3{F}=Vec3{F}(0,0,-1), direction::Vec3{F}=origin, up::Vec3{F}=Vec3{F}(0, 1, 0), fov::F=F(45), aspect_ratio::F=F(16/9), aperture::F=F(0), focus_dist::F=length(direction)) where F<:AbstractFloat
+    Camera(origin, direction, up, fov, aspect_ratio, aperture, focus_dist)
+end
+
 Camera(origin::Vec3{F}, direction::Vec3{F}, up::Vec3{F}, fov::F, aspect_ratio::F, aperture::F, focus_dist::F) where F<:AbstractFloat = Camera(origin, direction, up, fov, aspect_ratio, aperture, focus_dist, zero(F), zero(F))
 
 function get_ray(camera::Camera{F}, s::F, t::F) where F <: AbstractFloat
