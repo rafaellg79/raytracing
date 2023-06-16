@@ -1,6 +1,6 @@
 using Rotations
 
-scenes[:cornell_box] = (F::Type=Float32; N::Int=1000) -> begin
+scenes[:cornell_box] = (;F::Type=Float32, spp::Int=1000) -> begin
     aspect_ratio = one(F)
     width = 400
     height = trunc(Int, width / aspect_ratio)
@@ -34,7 +34,7 @@ scenes[:cornell_box] = (F::Type=Float32; N::Int=1000) -> begin
                 ]
     
     background = zero(Vec3{F})
-    pattern = Halton_sequence32(F, N)
+    pattern = Halton_sequence32(F, spp)
     
     width, height, camera, world, background, pattern
 end

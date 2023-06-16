@@ -1,4 +1,4 @@
-scenes[:cover1] = (F::Type=Float32; N::Int=500) -> begin
+scenes[:cover1] = (;F::Type=Float32, spp::Int=500) -> begin
     aspect_ratio = F(3/2)
     width = 1200
     height = trunc(Int, width / aspect_ratio)
@@ -43,7 +43,7 @@ scenes[:cover1] = (F::Type=Float32; N::Int=500) -> begin
     push!(world, Sphere(Vec3{F}(4, 1, 0), 1, Material(Metal, Vec3{F}(0.7, 0.6, 0.5), zero(F))))
     
     background = Vec3{F}(0.70, 0.80, 1.00)
-    pattern = Halton_sequence32(F, N)
+    pattern = Halton_sequence32(F, spp)
     
     width, height, camera, world, background, pattern
 end
