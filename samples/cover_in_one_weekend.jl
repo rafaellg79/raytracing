@@ -17,7 +17,7 @@ scenes[:cover1] = (;F::Type=Float32, spp::Int=500) -> begin
     
     # World
     ground = Material(Lambertian, Vec3{F}(0.5, 0.5, 0.5))
-    world = Sphere{F, Material{F, SolidColor{F}}}[Sphere(Vec3{F}(0, -1000, -1), 1000, ground)]
+    world = [Sphere(Vec3{F}(0, -1000, -1), 1000, ground)]
     for a = -11:10, b = -11:10
         choose_mat = rand(F)
         center = Vec3{F}(a + 0.9*rand(), 0.2, b + 0.9*rand())
