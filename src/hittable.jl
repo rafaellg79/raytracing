@@ -1,30 +1,7 @@
 include("bounding_box.jl")
 include("material.jl")
-
-struct Ray{F}
-    origin::Vec3{F}
-    direction::Vec3{F}
-    t::F
-    Ray{F}(origin::Vec3{F}, direction::Vec3{F}) where F = new(origin, direction, zero(F))
-    Ray{F}(origin::Vec3{F}, direction::Vec3{F}, t::F) where F = new(origin, direction, t)
-end
-
-Ray(origin::Vec3{F}, direction::Vec3{F}) where F = Ray{F}(origin, direction)
-Ray(origin::Vec3{F}, direction::Vec3{F}, t::F) where F = Ray{F}(origin, direction, t)
-Ray(origin::Vec3{F}, direction::Vec3{F}, t::Real) where F = Ray{F}(origin, direction, F(t))
-
-struct HitRecord{F, T}
-    t::F
-    p::Vec3{F}
-    normal::Vec3{F}
-    material::T
-    front_face::Bool
-    u::F
-    v::F
-end
-
-HitRecord(::Type{F}, ::Type{T}) where {F<:AbstractFloat, T<:Material} = HitRecord{F, T}(F(Inf), Vec3{F}(F(Inf)), Vec3{F}(zero(F)), T(), false, zero(F), zero(F))
-HitRecord(t::F, p::Vec3{F}, normal::Vec3{F}, material::T, front_face::Bool, u::F, v::F) where {F<:AbstractFloat, T<:Material} = HitRecord{F, T}(t, p, normal, material, front_face, u, v)
+include("ray.jl")
+include("hit_record.jl")
 
 abstract type Hittable{T} end
 
@@ -34,10 +11,6 @@ textype(::Type{<:AbstractVector{T}}) where T<:Hittable = textype(T)
 textype(::Type{<:AbstractVector{T}}) where T<:Material = T
 textype(objects::Vector{T}) where T<:Hittable = reduce(promote_type, (tex for tex in textype.(typeof.(objects))))
 textype(::Type{<:Hittable{T}}) where T<:Material = T
-
-function at(ray::Ray{F}, t::F) where F
-    return ray.origin + ray.direction * t
-end
 
 bounding_box(objects::AbstractVector{<:Hittable}, t::F) where F <: AbstractFloat = surrounding_box(objects)
 
@@ -107,53 +80,4 @@ function emit(hit::HitRecord{F, T}) where {F<:AbstractFloat, T<:Material}
     else
         return zero(Vec3{F})
     end
-end
-
-function hit(bbox::AABB, r::Ray{F}, t_min::F, t_max::F) where F <: AbstractFloat
-    tmin = (bbox.min.x - r.origin.x) / r.direction.x
-    tmax = (bbox.max.x - r.origin.x) / r.direction.x
-    if tmin > tmax
-        tmin, tmax = tmax, tmin
-    end
-    if tmax < t_max
-        t_max = tmax
-    end
-    if tmin > t_min
-        t_min = tmin
-    end
-    if t_max <= t_min
-        return false
-    end
-
-    tmin = (bbox.min.y - r.origin.y) / r.direction.y
-    tmax = (bbox.max.y - r.origin.y) / r.direction.y
-    if tmin > tmax
-        tmin, tmax = tmax, tmin
-    end
-    if tmax < t_max
-        t_max = tmax
-    end
-    if tmin > t_min
-        t_min = tmin
-    end
-    if t_max <= t_min
-        return false
-    end
-
-    tmin = (bbox.min.z - r.origin.z) / r.direction.z
-    tmax = (bbox.max.z - r.origin.z) / r.direction.z
-    if tmin > tmax
-        tmin, tmax = tmax, tmin
-    end
-    if tmax < t_max
-        t_max = tmax
-    end
-    if tmin > t_min
-        t_min = tmin
-    end
-    if t_max <= t_min
-        return false
-    end
-    
-    return true
 end

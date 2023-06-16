@@ -29,23 +29,6 @@ function cu_hit(obj::T, ray::Ray{F}, t_min::F, t_max::F) where {F, T}
     return hit(obj, ray, t_min, t_max)
 end
 
-# From Ray Tracing Gems II - Chapter 2
-function cu_hit(h::AABB, r::Ray{F}, t_min::F, t_max::F) where F
-    # Test for intersection with an AABB
-    inv_ray_dir = one(F) / r.direction
-    # Absolute distances to lower and upper box coordinates
-    t_lower = (h.min - r.origin)*inv_ray_dir
-    t_upper = (h.max - r.origin)*inv_ray_dir
-    # The three t-intervals (for x-/y-/z-slabs , and ray p(t))
-    t_mins = min(t_lower, t_upper)
-    t_maxes = max(t_lower, t_upper)
-    # Easy to remember: ``max of mins , and min of maxes ''
-    t_box_min = max(t_mins.x, t_mins.y, t_mins.z, t_min)
-    t_box_max = min(t_maxes.x, t_maxes.y, t_maxes.z, t_max)
-    
-    return t_box_min <= t_box_max
-end
-
 function cu_hit(next::CuDeviceArray, tree::CuBVHTree{A, B}, ray::Ray{F}, t_min::F, t_max::F) where {A, B, F}
     tex = textype(B)
     
