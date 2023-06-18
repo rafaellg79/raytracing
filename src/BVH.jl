@@ -12,7 +12,7 @@ end
 struct BVHTree{F, T<:Hittable} <: Hittable{T}
     nodes::Vector{BVHNode{F}}
     objects::Vector{T}
-    traversal_buffer::Vector{Int}
+    traversal_buffer::Matrix{Int}
 end
 
 import Base.eltype
@@ -23,7 +23,7 @@ function hit(tree::BVHTree{F, T}, ray::Ray{F}, t_min::F, t_max::F) where {F <: A
     if isempty(tree.nodes)
         return HitRecord(F, textype(T))
     end
-    next = tree.traversal_buffer
+    next = @view tree.traversal_buffer[:, Threads.threadid()]
     n = 1
     next[1] = 1
     closest_hit = HitRecord(F, textype(T))
@@ -101,7 +101,7 @@ function build_bvh(objects::Vector{<:Hittable})
     # TODO: bit of a hack to determine the appropriate floating point type, should change this later
     F = typeof(textype(typeof(objects[1]))().fuzz)
     nodes = Vector{BVHNode{F}}(undef, 2*length(objects)-1)
-    traversal_buffer = Vector{Int}(undef, ceil(Int, log2(length(nodes)))+1)
+    traversal_buffer = Matrix{Int}(undef, ceil(Int, log2(length(nodes)))+1, Threads.nthreads())
     tree = BVHTree(nodes, objects, traversal_buffer)# In the worst case the tree is full, so we have 2*num_leaves - 1 nodes
     build_bvh!(tree)
     return tree

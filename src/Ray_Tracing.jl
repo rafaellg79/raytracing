@@ -73,8 +73,10 @@ function draw!(img::Array{RGB{F},2}, world::SceneManager, camera::Camera{F}; bac
     
     bvh = build_bvh(world)
     
-    for i = 0:width-1
-        print("\r$i/$width")
+    processed_lines = Threads.Atomic{Int}(0)
+    
+    Threads.@threads for i = 0:width-1
+        print("\r$(Int(processed_lines[]))/$width")
         for j = height-1:-1:0
             col = Vec3{F}(0, 0, 0)
             for n in 1:size(pattern, 2)
@@ -89,9 +91,10 @@ function draw!(img::Array{RGB{F},2}, world::SceneManager, camera::Camera{F}; bac
             col = Vec3{F}(sqrt(col.x), sqrt(col.y), sqrt(col.z))
             img[height-j, i+1] = RGB{F}(col.x, col.y, col.z)
         end
+        Threads.atomic_add!(processed_lines, 1)
     end
     
-    print("\r$width/$width\n")
+    print("\r$(processed_lines[])/$width\n")
     
     return img
 end
