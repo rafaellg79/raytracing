@@ -64,7 +64,7 @@ scenes[:cover2] = (;F::Type=Float32, spp::Int=10000, kwargs...) -> begin
     push!(objects, ConstantMedium(boundary, F(0.0001), Vec3{F}(1)))
     
     # Earth
-    push!(objects, Sphere(Vec3{F}(400, 200, 400), 100, Material(Lambertian, ImageTexture("earthmap.jpg"), zero(F))))
+    push!(objects, Sphere(Vec3{F}(400, 200, 400), 100, Material(Lambertian, ImageTexture(joinpath("assets", "earthmap.jpg")), zero(F))))
     
     # Perlin texture
     push!(objects, Sphere(Vec3{F}(220, 280, 300), 80, Material(Lambertian, NoiseTexture{Vec3{F}}(0.1), zero(F))))
