@@ -1,6 +1,6 @@
 using Rotations
 
-scenes[:cornell_smoke_box] = (;F::Type=Float32, spp::Int=200) -> begin
+scenes[:cornell_smoke_box] = (;F::Type=Float32, spp::Int=200, kwargs...) -> begin
     aspect_ratio = one(F)
     width = 600
     height = trunc(Int, width / aspect_ratio)

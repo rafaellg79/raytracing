@@ -1,4 +1,4 @@
-scenes[:cover1] = (;F::Type=Float32, spp::Int=500) -> begin
+scenes[:cover1] = (;F::Type=Float32, spp::Int=500, kwargs...) -> begin
     aspect_ratio = F(3/2)
     width = 1200
     height = trunc(Int, width / aspect_ratio)

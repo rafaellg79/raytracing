@@ -5,6 +5,8 @@ for filename in readdir("samples")
     include(joinpath("samples", filename))
 end
 
-get_scene(::Type{F}, key::Symbol, args...) where F<:AbstractFloat = scenes[key](F; args...)
-get_scene(key::Symbol, args...) = scenes[key](;args...)
+function get_scene(key::Symbol; kwargs...)
+    width, height, camera, world, background, pattern = scenes[key](;kwargs...)
+    return world, (width=width, height=height, camera=camera, background=background, pattern=pattern)
+end
 scenes_list() = keys(scenes)

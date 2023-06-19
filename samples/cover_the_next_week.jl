@@ -1,6 +1,6 @@
 using Rotations
 
-scenes[:cover2] = (;F::Type=Float32, spp::Int=10000) -> begin
+scenes[:cover2] = (;F::Type=Float32, spp::Int=10000, kwargs...) -> begin
     aspect_ratio = one(F)
     width = 800
     height = trunc(Int, width / aspect_ratio)
