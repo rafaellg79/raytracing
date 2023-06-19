@@ -3,7 +3,6 @@ include("scenes.jl")
 
 # Use main with get_scene to render predefined scenes from the Ray Tracing in One Weekend series.
 function main(width, height, camera, world, background, pattern; output_filename=joinpath("outputs", "image.png"), gpu::Bool=false)
-    Random.seed!(0)
     world = SceneManager(world)
     
     img = zeros(RGB{eltype(pattern)}, height, width)
