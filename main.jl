@@ -22,7 +22,9 @@ function render(::Type{F}, world::Vector{<:Hittable};
                 camera=Camera(F), 
                 background=any(obj->obj.material.type==Emissive, world) ? zero(Vec3{F}) : Vec3{F}(0.70, 0.80, 1.00), 
                 pattern=F.(MSAA_S16), 
-                gpu::Bool=false) where F<:AbstractFloat
+                gpu::Bool=false,
+                kwargs...
+               ) where F<:AbstractFloat
     world = SceneManager(world)
     
     img = zeros(RGB{F}, height, width)
