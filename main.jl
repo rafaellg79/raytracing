@@ -55,3 +55,5 @@ function render(::Type{F}, key::Symbol; gpu::Bool=false, kwargs...) where F<:Abs
 end
 
 render(key::Symbol; kwargs...) = render(Float32, key; kwargs...)
+
+nothing
