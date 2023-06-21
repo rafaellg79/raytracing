@@ -73,12 +73,12 @@ function trilinear_interp(c::Array{Vec3{F}}, u::Real, v::Real, w::Real) where F<
     ww = F(w * w * (3 - 2w))
     
     accum = zero(F)
-    for k=1:2, j=1:2, i=1:2
+    for k=0:1, j=0:1, i=0:1
         weight_v = Vec3{F}(u-i, v-j, w-k)
-        accum += (i*uu + (2-i)*(1-uu)) *
-                 (j*vv + (2-j)*(1-vv)) *
-                 (k*ww + (2-k)*(1-ww)) *
-                 dot(c[i, j, k], weight_v)
+        accum += (i*uu + (1-i)*(1-uu)) *
+                 (j*vv + (1-j)*(1-vv)) *
+                 (k*ww + (1-k)*(1-ww)) *
+                 dot(c[i+1, j+1, k+1], weight_v)
     end
 
     return accum
@@ -86,11 +86,11 @@ end
 
 function trilinear_interp(c::Array{T}, u::T, v::T, w::T) where T
     accum = zero(T)
-    for k=1:2, j=1:2, i=1:2
-        accum += (i*u + (2-i)*(1-u)) *
-                 (j*v + (2-j)*(1-v)) *
-                 (k*w + (2-k)*(1-w)) *
-                 c[i, j, k]
+    for k=0:1, j=0:1, i=0:1
+        accum += (i*u + (1-i)*(1-u)) *
+                 (j*v + (1-j)*(1-v)) *
+                 (k*w + (1-k)*(1-w)) *
+                 c[i+1, j+1, k+1]
     end
 
     return accum
