@@ -43,7 +43,7 @@ KeySet for a Dict{Symbol, Function} with 5 entries. Keys:
   :cover2
   :cornell_smoke_box
 
-julia> img = render(:cornell_box));
+julia> img = render(:cornell_box);
 400/400
 ```
 
