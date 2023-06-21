@@ -1,6 +1,8 @@
 include("src/Ray_Tracing.jl")
 include("scenes.jl")
 
+using FileIO, MeshIO
+
 """
     render([F=Float32], world::Vector{<:Hittable}; kwargs...)
 
@@ -42,6 +44,23 @@ function render(::Type{F}, world::Vector{<:Hittable};
 end
 
 render(world::Vector{<:Hittable}; kwargs...) = render(Float32, world; kwargs...)
+
+"""
+    render([F=Float32], filename::String, material;kwargs...)
+
+Load a triangle mesh model from `filename` using `material` for the triangles material and ray trace the loaded mesh.
+"""
+function render(::Type{F}, filename::String, material::T; kwargs...) where {F<:AbstractFloat, T<:Material}
+    world = Hittable[]
+    
+    mesh = load(filename)
+    for tri in mesh
+        push!(world, Triangle(Vec3{Float32}(tri[1]...), Vec3{Float32}(tri[2]...), Vec3{Float32}(tri[3]...), material))
+    end
+    render(world; kwargs...)
+end
+
+render(filename::String, material::Material; kwargs...) = render(Float32, filename, material; kwargs...)
 
 """
     render([F=Float32], key::Symbol; kwargs...)
