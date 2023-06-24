@@ -1,21 +1,24 @@
 include("hittable.jl")
+include("vertex.jl")
 
-struct Triangle{F, T} <: Hittable{T}
-    v1::Vec3{F}
-    v2::Vec3{F}
-    v3::Vec3{F}
+struct Triangle{V, T} <: Hittable{T}
+    v1::V
+    v2::V
+    v3::V
     material::T
 end
 
-Triangle(v1::Tuple{F, F, F}, v2::Tuple{F, F, F}, v3::Tuple{F, F, F}, material::T) where {F <:AbstractFloat, T<:Material{F}} = Triangle(Vec3{F}(v1...), Vec3{F}(v2...), Vec3{F}(v3...), material)
-
-function bounding_box(t::Triangle{F}) where F<:AbstractFloat
-    x_min = min(t.v1.x, t.v2.x, t.v3.x)-F(0.0001)
-    y_min = min(t.v1.y, t.v2.y, t.v3.y)-F(0.0001)
-    z_min = min(t.v1.z, t.v2.z, t.v3.z)-F(0.0001)
-    x_max = max(t.v1.x, t.v2.x, t.v3.x)+F(0.0001)
-    y_max = max(t.v1.y, t.v2.y, t.v3.y)+F(0.0001)
-    z_max = max(t.v1.z, t.v2.z, t.v3.z)+F(0.0001)
+function bounding_box(t::Triangle{<:Vertex{F}}) where F<:AbstractFloat
+    v1 = t.v1.position
+    v2 = t.v2.position
+    v3 = t.v3.position
+    
+    x_min = min(v1.x, v2.x, v3.x)-F(0.0001)
+    y_min = min(v1.y, v2.y, v3.y)-F(0.0001)
+    z_min = min(v1.z, v2.z, v3.z)-F(0.0001)
+    x_max = max(v1.x, v2.x, v3.x)+F(0.0001)
+    y_max = max(v1.y, v2.y, v3.y)+F(0.0001)
+    z_max = max(v1.z, v2.z, v3.z)+F(0.0001)
     return AABB{F}(Vec3{F}(x_min, y_min, z_min), Vec3{F}(x_max, y_max, z_max))
 end
 
@@ -67,10 +70,60 @@ end
 #
 # Doing the same to t
 # t = dot(normal, V1 - ray_origin) * c
-function hit(triangle::Triangle{F, T}, r::Ray{F}, t_min::F, t_max::F) where {F<:AbstractFloat, T<:Material}
-    e1 = triangle.v2 - triangle.v1
-    e2 = triangle.v3 - triangle.v1
-    origin_v1 = triangle.v1 - r.origin
+function hit(v1::Vec3{F}, v2::Vec3{F}, v3::Vec3{F}, r::Ray{F}, t_min::F, t_max::F) where F<:AbstractFloat
+    e1 = v2 - v1
+    e2 = v3 - v1
+    origin_v1 = v1 - r.origin
+    
+    normal = cross(e1, e2)
+    s = cross(origin_v1, r.direction) # s = cross(ray_direction, -origin_v1) = -cross(-origin_v1, ray_direction) = cross(origin_v1, ray_direction)
+    c = inv(dot(normal, r.direction))
+    
+    u = dot(s, e2) *  c
+    v = dot(s, e1) * -c
+    t = dot(normal, origin_v1) * c
+    
+    if u < zero(F) || v < zero(F) || u+v > one(F) || t < t_min || t_max < t
+        return F(Inf), normal, F(-1), F(-1)
+    end
+    
+    return t, normal, u, v
+end
+
+hit(v1::V, v2::V, v3::V, r::Ray{F}, t_min::F, t_max::F) where V<:Vertex{F} where F = hit(v1.position, v2.position, v3.position, r, t_min, t_max)
+
+function get_triangle_vertex_at_uv(triangle::Triangle, u::Real, v::Real)
+    w = 1-u-v
+    vertex = triangle.v1*w + triangle.v2*u + triangle.v3*v
+    return vertex
+end
+
+function hit(triangle::Triangle{V, T}, r::Ray{F}, t_min::F, t_max::F) where {V, F<:AbstractFloat, T<:Material}
+    v1, v2, v3 = triangle.v1, triangle.v2, triangle.v3
+    t, normal, u, v = hit(v1, v2, v3, r, t_min, t_max)
+    if t == F(Inf)
+        return HitRecord(F, T)
+    end
+    
+    vertex = get_triangle_vertex_at_uv(triangle, u, v)
+    
+    vertex_has_normal_data = almost_zero(vertex.normal)
+    vertex_has_uv_data = vertex.u >= 0 && vertex.v >= 0
+    
+    normal = vertex_has_normal_data * vertex.normal + (!vertex_has_normal_data) * normal
+    u = vertex_has_uv_data * vertex.u + !vertex_has_uv_data * u
+    v = vertex_has_uv_data * vertex.v + !vertex_has_uv_data * v
+    
+    p = at(r, t)
+    front_face = dot(r.direction, normal) < zero(F)
+    
+    return HitRecord(t, p, (-1+(front_face<<1)) * normalize(normal), triangle.material, front_face, u, v)
+end
+
+function cu_hit(v1::Vec3{F}, v2::Vec3{F}, v3::Vec3{F}, material::T, r::Ray{F}, t_min::F, t_max::F) where {F<:AbstractFloat, T<:Material}
+    e1 = v2 - v1
+    e2 = v3 - v1
+    origin_v1 = v1 - r.origin
     
     normal = cross(e1, e2)
     s = cross(origin_v1, r.direction) # s = cross(ray_direction, -origin_v1) = -cross(-origin_v1, ray_direction) = cross(origin_v1, ray_direction)
@@ -86,5 +139,7 @@ function hit(triangle::Triangle{F, T}, r::Ray{F}, t_min::F, t_max::F) where {F<:
     
     p = at(r, t)
     front_face = dot(r.direction, normal) < zero(F)
-    return HitRecord(t, p, (-1+(front_face<<1)) * normalize(normal), triangle.material, front_face, u, v)
+    return HitRecord(t, p, (-1+(front_face<<1)) * normalize(normal), material, front_face, u, v)
 end
+
+cu_hit(triangle::Triangle{F, T}, r::Ray{F}, t_min::F, t_max::F) where {F<:AbstractFloat, T<:Material} = hit(triangle, r, t_min, t_max)#cu_hit(triangle.v1, triangle.v2, triangle.v3, triangle.material, r, t_min, t_max)

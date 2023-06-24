@@ -1,7 +1,7 @@
 include("src/Ray_Tracing.jl")
 include("scenes.jl")
 
-using FileIO, MeshIO
+using FileIO, MeshIO, GeometryBasics
 
 """
     render([F=Float32], world::Vector{<:Hittable}; kwargs...)
@@ -54,9 +54,19 @@ function render(::Type{F}, filename::String, material::T; kwargs...) where {F<:A
     world = Hittable[]
     
     mesh = load(filename)
-    for tri in mesh
-        push!(world, Triangle(Vec3{Float32}(tri[1]...), Vec3{Float32}(tri[2]...), Vec3{Float32}(tri[3]...), material))
+    coordinates = GeometryBasics.coordinates(mesh)
+    normals = GeometryBasics.normals(mesh)
+    uv_coordinates = GeometryBasics.texturecoordinates(mesh)
+    faces = GeometryBasics.faces(mesh)
+    
+    for i in 1:length(faces)
+        tri = faces[i]
+        v1 = Vertex(Vec3{F}(coordinates[tri[1]]...), Vec3{F}(normals[tri[1]]...), uv_coordinates[tri[1]]...)
+        v2 = Vertex(Vec3{F}(coordinates[tri[2]]...), Vec3{F}(normals[tri[2]]...), uv_coordinates[tri[2]]...)
+        v3 = Vertex(Vec3{F}(coordinates[tri[3]]...), Vec3{F}(normals[tri[3]]...), uv_coordinates[tri[3]]...)
+        push!(world, Triangle(v1, v2, v3, material))
     end
+    
     render(world; kwargs...)
 end
 
