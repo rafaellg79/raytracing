@@ -18,7 +18,7 @@ function Adapt.adapt_structure(to, bvh::CuBVHTree{A, B}) where {A, B}
 end
 
 function cu(bvh::BVHTree{A}) where A
-    return CuBVHTree(cu(bvh.nodes), cu(bvh.objects))
+    return CuBVHTree(cu(bvh.nodes), cu(cu.(bvh.objects)))
 end
 
 function cu_hit(buffer::CuDeviceArray, obj::T, ray::Ray{F}, t_min::F, t_max::F) where {F, T}

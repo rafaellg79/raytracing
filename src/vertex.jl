@@ -12,7 +12,10 @@ Vertex(position::Vec3{F}, normal::Vec3{F}) where F<:AbstractFloat = Vertex{F}(po
 Vertex(position::Vec3{F}, u::F, v::F) where F<:AbstractFloat = Vertex{F}(position, zero(Vec3{F}), u, v)
 Vertex(position::Vec3{F}, normal::Vec3{F}, u::F, v::F) where F<:AbstractFloat = Vertex{F}(position, normal, u, v)
 
-import Base: +, -, *
+import Base: +, -, *, eltype
+
+eltype(v::Vertex{F}) where F<:AbstractFloat = F
+eltype(::Type{Vertex{F}}) where F<:AbstractFloat = F
 
 +(a::V, b::V) where V<:Vertex = Vertex(a.position + b.position, a.normal + b.normal, a.u + b.u, a.v + b.v)
 -(a::V, b::V) where V<:Vertex = Vertex(a.position - b.position, a.normal - b.normal, a.u - b.u, a.v - b.v)
