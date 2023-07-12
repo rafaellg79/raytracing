@@ -12,7 +12,7 @@ Ray trace `world` and returns an `Array{RGB{F}}` with the rendered image.
 - `width` : width in pixels 
 - `height` : height in pixels
 - `camera` : `Camera` object viewing the world
-- `background` : a `Vec3` with the background color by default it's sky blue if no emissive object exists, otherwise it's black
+- `background` : a `Vec3` with the background color by default it's sky blue
 - `pattern` : matrix `[x_0 ... x_n; y_0 ... y_n]` with the horizontal and vertical offsets of the ray direction
 - `gpu` : set true to use CUDA.jl implementation
 
@@ -22,7 +22,7 @@ function render(::Type{F}, world::Vector{<:Hittable};
                 width=1280, 
                 height=720, 
                 camera=Camera(F), 
-                background=any(obj->obj.material.type==Emissive, world) ? zero(Vec3{F}) : Vec3{F}(0.70, 0.80, 1.00), 
+                background=Vec3{F}(0.70, 0.80, 1.00), 
                 pattern=F.(MSAA_S16), 
                 gpu::Bool=false,
                 kwargs...
