@@ -39,6 +39,7 @@ function hit(tree::BVHTree{F, T}, ray::Ray{F}, t_min::F, t_max::F) where {F <: A
         if node.is_leaf
             h = hit((@view tree.objects[node.left:node.right]), ray, t_min, t_max)
             if h.t < closest_hit.t
+                t_max = h.t
                 closest_hit = h
             end
         else
@@ -75,13 +76,13 @@ function build_bvh!(tree::BVHTree{F}; node_id::Int=1, left::Int=1, right::Int=le
     axis_length = box.max - box.min
     axis = findmax(getfield(axis_length, i) for i in 1:3)[2]
     if axis == 1
-        comparator = (a, b) -> (bounding_box(a).min.x < bounding_box(b).min.x)
+        comparator = (a, b) -> (a.min.x < b.min.x)
     elseif axis == 2
-        comparator = (a, b) -> (bounding_box(a).min.y < bounding_box(b).min.y)
+        comparator = (a, b) -> (a.min.y < b.min.y)
     else
-        comparator = (a, b) -> (bounding_box(a).min.z < bounding_box(b).min.z)
+        comparator = (a, b) -> (a.min.z < b.min.z)
     end
-    sort!((@view objects[left:right]); lt=comparator)
+    sort!((@view objects[left:right]); by=bounding_box, lt=comparator)
     
     # Recursively visit the left and right children
     mid = (left+right) ÷ 2
