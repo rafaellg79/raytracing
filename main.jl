@@ -59,15 +59,25 @@ function render(::Type{F}, filename::String, material::T; kwargs...) where {F<:A
     uv_coordinates = GeometryBasics.texturecoordinates(mesh)
     faces = GeometryBasics.faces(mesh)
     
-    for i in 1:length(faces)
-        tri = faces[i]
-        v1 = Vertex(Vec3{F}(coordinates[tri[1]]...), Vec3{F}(normals[tri[1]]...), uv_coordinates[tri[1]]...)
-        v2 = Vertex(Vec3{F}(coordinates[tri[2]]...), Vec3{F}(normals[tri[2]]...), uv_coordinates[tri[2]]...)
-        v3 = Vertex(Vec3{F}(coordinates[tri[3]]...), Vec3{F}(normals[tri[3]]...), uv_coordinates[tri[3]]...)
-        push!(world, Triangle(v1, v2, v3, material))
+    if isnothing(normals)
+        normals = zeros(Point{3, F}, length(coordinates))
+    end
+    if isnothing(uv_coordinates)
+        uv_coordinates = fill(Point{2, Float32}(-1), length(coordinates))
     end
     
-    render(world; kwargs...)
+    vertices = map((c, n, uv) -> Vertex(Vec3{F}(c...), Vec3{F}(n...), uv[1], uv[2]), coordinates, normals, uv_coordinates)
+    inds = ones(Int, 4, length(faces))
+    
+    for i in 1:length(faces)
+        tri = faces[i]
+        inds[1, i] = tri[1]
+        inds[2, i] = tri[2]
+        inds[3, i] = tri[3]
+    end
+    
+    push!(world, Mesh(vertices, [material], inds))
+    render(F, world; kwargs...)
 end
 
 render(filename::String, material::Material; kwargs...) = render(Float32, filename, material; kwargs...)
@@ -80,7 +90,7 @@ Render a scene from `scene_list()` given the scene `key` with `kwargs...` parame
 function render(::Type{F}, key::Symbol; gpu::Bool=false, kwargs...) where F<:AbstractFloat
     world, scene_kwargs = get_scene(key; F=F, kwargs...)
     kwargs = merge(scene_kwargs, kwargs)
-    render(world; kwargs..., gpu=gpu)
+    render(F, world; kwargs..., gpu=gpu)
 end
 
 render(key::Symbol; kwargs...) = render(Float32, key; kwargs...)
